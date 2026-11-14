@@ -1,0 +1,10 @@
+{
+  "name": "trackers",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler d1 migrations apply trackers-db --local && wrangler dev",
+    "deploy": "wrangler d1 migrations apply trackers-db --remote && wrangler deploy",
+    "set-password": "wrangler secret put APP_PASSWORD"
+  }
+}
