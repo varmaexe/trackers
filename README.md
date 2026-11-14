@@ -7,7 +7,7 @@ A Cloudflare Worker serves the mobile web app in `public/` and an API backed by 
 A cron trigger runs every minute to send Web Push reminders (`src/push.js`, no dependencies).
 
 - Local: `npm run dev` (first visit asks to set up an account; the "old app password" is `dev`, from `.dev.vars`)
-- Deploy: `npm run deploy` (applies D1 migrations, then deploys)
+- Deploy: `npm run deploy` (migrations → deploy → commit & push to GitHub). Optional message: `npm run deploy -- "what changed"`
 - Backup: Manage → Export my data, or `wrangler d1 export trackers-db --remote --output backup.sql`
 
 Accounts: the first account is the owner (proves ownership with the `APP_PASSWORD` secret and
