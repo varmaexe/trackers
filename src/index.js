@@ -217,7 +217,7 @@ async function handleApi(request, env, url) {
     // First account = owner. Proves ownership with the old APP_PASSWORD and adopts all existing data.
     const b = await readJson(request);
     if (await db.prepare("SELECT 1 FROM users LIMIT 1").first()) throw new HttpError(400, "Already set up — log in instead");
-    if (!env.APP_PASSWORD || typeof b.owner_password !== "string" || !(await safeEqual(b.owner_password, env.APP_PASSWORD))) {
+    if (!env.APP_PASSWORD || typeof b.owner_password !== "string" || !(await safeEqual(b.owner_password.trim(), String(env.APP_PASSWORD).trim()))) {
       await slowFail();
       throw new HttpError(401, "Old app password is wrong");
     }

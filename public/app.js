@@ -1010,7 +1010,7 @@ function renderAuth(mode) {
       <p class="hint">Already have an account? <button class="link" data-act="auth" data-v="login">Log in</button></p>`,
     setup: `<p class="sub">Set up your account. Everything you've tracked so far moves into it.</p>
       <form data-form="setup">
-        <input type="password" name="owner_password" placeholder="Current app password" autocomplete="current-password" required>
+        <input type="password" name="owner_password" placeholder="Setup password (APP_PASSWORD)" autocomplete="off" autocapitalize="none" spellcheck="false" required>
         <input type="text" name="name" placeholder="Your name" maxlength="40" autocomplete="given-name">
         ${user}
         <input type="password" name="password" placeholder="New password (8+ characters)" autocomplete="new-password" minlength="8" required>
