@@ -570,8 +570,8 @@ function sheetDiary(st) {
 function sheetPassword() {
   return `<div class="sheet-head"><h2>Change password</h2><button class="iconbtn" data-act="close" aria-label="Close">✕</button></div>
     <form data-form="password">
-      <label class="field"><span>Current password</span><input type="password" name="current" autocomplete="current-password" required></label>
-      <label class="field"><span>New password</span><input type="password" name="password" autocomplete="new-password" minlength="8" required></label>
+      <label class="field"><span>Current password</span>${pw(`name="current" autocomplete="current-password" required`)}</label>
+      <label class="field"><span>New password</span>${pw(`name="password" autocomplete="new-password" minlength="8" required`)}</label>
       <button class="btn" type="submit">Change password</button><div class="err"></div>
       <p class="hint">Your other devices will be signed out.</p>
     </form>`;
@@ -990,13 +990,19 @@ async function showAuth() {
   renderAuth(mode);
 }
 
+// Password input with a show/hide toggle.
+const EYE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-6.5 0-10-7-10-7a18.4 18.4 0 0 1 5.1-5.9M9.9 5.2A9.7 9.7 0 0 1 12 5c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M2 2l20 20"/></svg>';
+const pw = (attrs) =>
+  `<span class="pw"><input type="password" ${attrs} autocapitalize="none" autocorrect="off" spellcheck="false"><button type="button" class="pw-eye" data-act="pw-toggle" aria-label="Show password" aria-pressed="false">${EYE}</button></span>`;
+
 function renderAuth(mode) {
   const inv = inviteParam();
   const user = `<input type="text" name="username" placeholder="Username" autocomplete="username" autocapitalize="none" spellcheck="false" required minlength="3" maxlength="30">`;
   const forms = {
     login: `<p class="sub">Welcome back 👋</p>
       <form data-form="login">${user}
-        <input type="password" name="password" placeholder="Password" autocomplete="current-password" required>
+        ${pw(`name="password" placeholder="Password" autocomplete="current-password" required`)}
         <button class="btn" type="submit">Log in</button><div class="err"></div></form>
       <p class="hint">Got an invite? <button class="link" data-act="auth" data-v="signup">Create an account</button></p>`,
     signup: `<p class="sub">${inv ? "You've been invited! 🎉 Create your account." : "Create your account"}</p>
@@ -1004,16 +1010,16 @@ function renderAuth(mode) {
         ${inv ? `<input type="hidden" name="invite" value="${esc(inv)}">` : `<input type="text" name="invite" placeholder="Invite code or link" required autocapitalize="none">`}
         <input type="text" name="name" placeholder="Your name" maxlength="40" autocomplete="given-name">
         ${user}
-        <input type="password" name="password" placeholder="Password (8+ characters)" autocomplete="new-password" minlength="8" required>
+        ${pw(`name="password" placeholder="Password (8+ characters)" autocomplete="new-password" minlength="8" required`)}
         <button class="btn" type="submit">Create account</button><div class="err"></div></form>
       <p class="hint">Your trackers and diary are private to you.</p>
       <p class="hint">Already have an account? <button class="link" data-act="auth" data-v="login">Log in</button></p>`,
     setup: `<p class="sub">Set up your account. Everything you've tracked so far moves into it.</p>
       <form data-form="setup">
-        <input type="password" name="owner_password" placeholder="Setup password (APP_PASSWORD)" autocomplete="off" autocapitalize="none" spellcheck="false" required>
+        ${pw(`name="owner_password" placeholder="Setup password (APP_PASSWORD)" autocomplete="off" autocapitalize="none" spellcheck="false" required`)}
         <input type="text" name="name" placeholder="Your name" maxlength="40" autocomplete="given-name">
         ${user}
-        <input type="password" name="password" placeholder="New password (8+ characters)" autocomplete="new-password" minlength="8" required>
+        ${pw(`name="password" placeholder="New password (8+ characters)" autocomplete="new-password" minlength="8" required`)}
         <button class="btn" type="submit">Create my account</button><div class="err"></div></form>
       <p class="hint">After this you log in with your username. You can then invite friends & family from Manage.</p>`,
   };
@@ -1030,6 +1036,9 @@ async function logout() {
 }
 
 // ---------- events ----------
+// Keep focus (and the phone keyboard) in the password box when tapping the eye.
+document.addEventListener("pointerdown", (ev) => { if (ev.target.closest(".pw-eye")) ev.preventDefault(); });
+
 document.addEventListener("click", async (ev) => {
   const nav = ev.target.closest("#nav button");
   if (nav) { S.view = nav.dataset.view; closeSheet(); render(); scrollTo(0, 0); return; }
@@ -1110,6 +1119,14 @@ document.addEventListener("click", async (ev) => {
       case "push-test": el.disabled = true; await api("/push/test", { method: "POST" }); toast("Sent! It should pop up in a few seconds."); el.disabled = false; break;
       case "logout": await logout(); break;
       case "auth": renderAuth(el.dataset.v); break;
+      case "pw-toggle": {
+        const input = el.previousElementSibling, show = input.type === "password";
+        input.type = show ? "text" : "password";
+        el.innerHTML = show ? EYE_OFF : EYE;
+        el.setAttribute("aria-label", show ? "Hide password" : "Show password");
+        el.setAttribute("aria-pressed", String(show));
+        break;
+      }
       case "password": openSheet({ type: "password" }); break;
       case "mood-quick":
         saveDiary(el.dataset.date, Number(el.dataset.v), S.diary.get(el.dataset.date)?.text);

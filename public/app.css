@@ -324,3 +324,10 @@ form[data-form=invite] input { padding: 9px 12px; }
 .moodstrip { display: flex; align-items: flex-end; gap: 2px; height: 44px; margin-top: 10px; }
 .moodstrip i { flex: 1; height: 8%; border-radius: 3px; background: var(--card-2); }
 textarea[name=text] { line-height: 1.5; min-height: 180px; }
+
+/* password show/hide */
+.pw { position: relative; display: block; }
+.pw input { padding-right: 46px; }
+.pw-eye { position: absolute; top: 0; right: 0; height: 100%; width: 44px; display: grid; place-items: center;
+  background: none; border: 0; padding: 0; color: var(--muted); cursor: pointer; }
+.pw-eye:hover, .pw-eye[aria-pressed="true"] { color: var(--accent); }
